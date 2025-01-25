@@ -1,0 +1,1542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Furkan's Study Plan 2025</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      background-color: #f2f4f8;
+      color: #333;
+      line-height: 1.5;
+    }
+    h1 {
+      background-color: #2c3e50;
+      color: #fff;
+      padding: 1rem;
+      margin: 0;
+      font-size: 1.8rem;
+      letter-spacing: 1px;
+    }
+    p {
+      margin: 1rem;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 1rem auto;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+      padding: 1rem 1rem 2rem;
+    }
+    details {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin: 1rem 0;
+      padding: 0.5rem;
+      background-color: #fafafa;
+    }
+    summary {
+      cursor: pointer;
+      font-size: 1.1rem;
+      font-weight: 600;
+      outline: none;
+      padding: 0.5rem;
+      color: #2c3e50;
+    }
+    summary::-webkit-details-marker {
+      display: none;
+    }
+    details details {
+      margin-left: 1rem;
+      border-color: #ccc;
+      background-color: #fff;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    details details summary {
+      font-size: 1rem;
+      font-weight: 500;
+      color: #34495e;
+    }
+    ul.tasks-list {
+      list-style: none;
+      padding-left: 1em;
+      margin: 0.5rem 0;
+    }
+    ul.tasks-list li {
+      margin: 0.25rem 0;
+      display: flex;
+      align-items: center;
+    }
+    input[type="checkbox"] {
+      margin-right: 0.5rem;
+      cursor: pointer;
+      transform: scale(1.1);
+    }
+    .day-footer, .subsection-header {
+      margin: 0.5rem 0;
+    }
+    .btn {
+      display: inline-block;
+      padding: 0.3rem 0.6rem;
+      margin: 0.2rem;
+      font-size: 0.9rem;
+      color: #fff;
+      background-color: #2980b9;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background-color: #3498db;
+    }
+    .btn-remove {
+      background-color: #c0392b;
+    }
+    .btn-remove:hover {
+      background-color: #e74c3c;
+    }
+    .remove-task {
+      font-size: 0.8rem;
+      color: #aaa;
+      margin-left: 0.5rem;
+      cursor: pointer;
+    }
+    .remove-task:hover {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+    details[open] {
+      animation: openAnim 0.2s ease-in-out;
+    }
+    @keyframes openAnim {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+  </style>
+</head>
+
+<body>
+<h1>Furkan's Study Plan 2025</h1>
+<div class="container">
+  <p>
+    Each Day is collapsible. Under each Day, you have four subtitles: Physics 2, Circuit Theory, MA 2, and LAG (unless that day has none or “No tasks”).  
+    <br>
+    • <strong>Physics 2</strong> contains your “Lecture X,” “Exercise X,” “Recap” tasks.<br>
+    • <strong>Circuit Theory</strong> contains <em>all slides</em> (00–15c) and circuit references.<br>
+    • <strong>MA 2</strong> has the tasks from your plan (theory, exercises, Moodle, etc.).<br>
+    • <strong>LAG</strong> has notes, textbooks, or general review tasks.
+    <br><br>
+    You can check tasks, add or remove them, or add/remove entire subtitles. 
+  </p>
+
+  <!-- JavaScript for interactivity -->
+  <script>
+    let uniqueId = 0;
+    function getUniqueId() {
+      uniqueId++;
+      return 'autoId_' + uniqueId;
+    }
+
+    function addSubsection(dayId) {
+      const dayElement = document.getElementById(dayId);
+      if (!dayElement) return;
+      const subsectionName = prompt("Enter a title for this new subsection:");
+      if (!subsectionName) return;
+      const detailsEl = document.createElement('details');
+      detailsEl.open = true;
+      const summaryEl = document.createElement('summary');
+      summaryEl.textContent = subsectionName;
+      detailsEl.appendChild(summaryEl);
+
+      const headerDiv = document.createElement('div');
+      headerDiv.className = 'subsection-header';
+      const addTaskBtn = document.createElement('button');
+      addTaskBtn.className = 'btn';
+      addTaskBtn.textContent = 'Add Task';
+      addTaskBtn.onclick = () => addTask(detailsEl);
+      headerDiv.appendChild(addTaskBtn);
+
+      const removeSubBtn = document.createElement('button');
+      removeSubBtn.className = 'btn btn-remove';
+      removeSubBtn.textContent = 'Remove Subsection';
+      removeSubBtn.onclick = () => detailsEl.remove();
+      headerDiv.appendChild(removeSubBtn);
+
+      detailsEl.appendChild(headerDiv);
+      const ulEl = document.createElement('ul');
+      ulEl.className = 'tasks-list';
+      detailsEl.appendChild(ulEl);
+      dayElement.appendChild(detailsEl);
+    }
+
+    function addTask(subsectionDetails) {
+      const taskText = prompt("Enter task description:");
+      if (!taskText) return;
+      const ul = subsectionDetails.querySelector('.tasks-list');
+      if (!ul) return;
+      const li = document.createElement('li');
+      const checkId = getUniqueId();
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.id = checkId;
+      const label = document.createElement('label');
+      label.setAttribute('for', checkId);
+      label.textContent = taskText;
+      const removeLink = document.createElement('span');
+      removeLink.className = 'remove-task';
+      removeLink.textContent = '(x)';
+      removeLink.onclick = () => li.remove();
+      li.appendChild(checkbox);
+      li.appendChild(label);
+      li.appendChild(removeLink);
+      ul.appendChild(li);
+    }
+  </script>
+
+  <!-- ================= DAY 1 (Jan 25) ================= -->
+  <details>
+    <summary>Day 1 (January 25, 2025)</summary>
+    <div id="day1">
+      <!-- PHYSICS 2 -->
+      <details open>
+        <summary>Physics 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Lecture 1</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Exercise 1</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <!-- CIRCUIT THEORY -->
+      <details open>
+        <summary>Circuit Theory</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Slides 00–06</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Slide 00 (Intro) | Textbook: Ch. 1.1 (Introduction)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Slide 01 (Basic Definitions) | Textbook: Ch. 1.2–1.3</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Slide 02 (Circuits KVL, KCL, Tellegen) | Textbook: Ch. 2.1–2.2</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Slide 03 (Basic Elements) | Textbook: Ch. 2.3</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Slide 04 (Circuit Solution via KCL, KVL) | Textbook: Ch. 2.4–2.5</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Slide 05 (Circuit Solution by Reduction) | Textbook: Ch. 2.6–2.7</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Slide 06 (Millman Basic Equivalences) | Textbook: Ch. 2.8–2.9</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <!-- MA 2 -->
+      <details open>
+        <summary>MA 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Theory 00 – Notes on Laplace (Prof. Tilli)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Theory 01 – Laplace Transform 26‑09‑24.pdf</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Exercise 01 – Lesson 27‑09 &amp; 04‑10 (Intro Laplace)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Subchapter: Laplace Transform</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Exercise: Exercises on Laplace Transform</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <!-- LAG -->
+      <details open>
+        <summary>LAG (Linear Algebra)</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Notes 1–3</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Textbook: Ch. 1.1–1.3 (Vectors, Linear Combinations, Dot Product, Linear Equations)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+    </div>
+    <div class="day-footer">
+      <button class="btn" onclick="addSubsection('day1')">Add Subsection</button>
+    </div>
+  </details>
+
+  <!-- ================= DAY 2 (Jan 26) ================= -->
+  <details>
+    <summary>Day 2 (January 26, 2025)</summary>
+    <div id="day2">
+      <details open>
+        <summary>Physics 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Lecture 2</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Exercise 2</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>Circuit Theory</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Slides 07–08</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Slide 07 (Superposition) | Textbook: Ch. 4.2–4.3</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Slide 08 (Thevenin, Norton) | Textbook: Ch. 4.5–4.6</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>MA 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Theory 02 – Laplace Transform 28‑09‑24.pdf</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Theory 03 – Laplace Transform, Curves 03‑10‑24.pdf</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Exercise 02 – Lesson 08‑10 (Curves, Domain, Level Sets)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox" disabled><label>(No new Moodle subchapter/test/exercise this day)</label></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>LAG (Linear Algebra)</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Notes 4–5</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Textbook: Ch. 2.1–2.2 (Matrices, Elimination for Ax = b)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+    </div>
+    <div class="day-footer">
+      <button class="btn" onclick="addSubsection('day2')">Add Subsection</button>
+    </div>
+  </details>
+
+  <!-- ================= DAY 3 (Jan 27) ================= -->
+  <details>
+    <summary>Day 3 (January 27, 2025)</summary>
+    <div id="day3">
+      <details open>
+        <summary>Physics 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Lecture 3</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Exercise 3</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>Circuit Theory</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Slides 09a–09b</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Slide 09a (Nodal Analysis MNA) | Textbook: Ch. 3.2–3.3</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Slide 09b (SPICE) | Textbook: Ch. 3.8</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>MA 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Theory 04 – Curves, Scalar Functions 05‑10‑24.pdf</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Theory 05 – Scalar Functions 10‑10‑24.pdf</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Exercise 03 – Lesson 15‑10 (Differential Calculus in Several Vars)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Subchapter: Multivariable Functions</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Test: Test on differential calculus</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>LAG (Linear Algebra)</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Notes 6–8</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Textbook: Ch. 2.3–2.4 (Matrix Operations, Transposes, Inverses)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+    </div>
+    <div class="day-footer">
+      <button class="btn" onclick="addSubsection('day3')">Add Subsection</button>
+    </div>
+  </details>
+
+  <!-- ================= DAY 4 (Jan 28) ================= -->
+  <details>
+    <summary>Day 4 (January 28, 2025)</summary>
+    <div id="day4">
+      <details open>
+        <summary>Physics 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Lecture 4 and 5</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Exercise 4</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>Circuit Theory</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Slides 10–11</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Slide 10 (Controlled Sources) | Textbook: Ch. 3.5–3.6</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Slide 11 (OpAmp) | Textbook: Ch. 5.1–5.3</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>MA 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Theory 06 – Scalar Functions 11‑10‑24.pdf</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Theory 07 – Taylor Expansions 17‑10‑24.pdf</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Exercise 04 – Lesson 22 &amp; 25‑10 (Taylor Series, Hessian)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Subchapter: Multivariable Functions</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Test: Test on unconstrained maxima and minima (guided)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>LAG (Linear Algebra)</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Notes 9–10</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Textbook: Ch. 2.5–2.6 (LU Factorization, Permutations, Determinants)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+    </div>
+    <div class="day-footer">
+      <button class="btn" onclick="addSubsection('day4')">Add Subsection</button>
+    </div>
+  </details>
+
+  <!-- ================= DAY 5 (Jan 29) ================= -->
+  <details>
+    <summary>Day 5 (January 29, 2025)</summary>
+    <div id="day5">
+      <details open>
+        <summary>Physics 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Recap + Moodle Test Part 1</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>Circuit Theory</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Slides 12–13a</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Slide 12 (SPICE Controlled Sources) | Textbook: Ch. 3.8</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Slide 13a (Capacitors, Inductors) | Textbook: Ch. 6.1</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>MA 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Theory 08 – Optimization 18‑10‑24.pdf</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>08 – Additional Proof.pdf</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Exercises on constrained maxima and minima</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Subchapter: Multivariable Functions</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Tests: Test on unconstrained maxima and minima</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Exercise: Exercises on constrained maxima and minima</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>LAG (Linear Algebra)</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Notes 11–12</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Textbook: Ch. 3.1–3.2 (Column Space, Nullspace, Solving Ax = b)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+    </div>
+    <div class="day-footer">
+      <button class="btn" onclick="addSubsection('day5')">Add Subsection</button>
+    </div>
+  </details>
+
+  <!-- ================= DAY 6 (Jan 30) ================= -->
+  <details>
+    <summary>Day 6 (January 30, 2025)</summary>
+    <div id="day6">
+      <details open>
+        <summary>Physics 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Lecture 6</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Exercise 5</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>Circuit Theory</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Slides 13b–13c</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Slide 13b (First Order) | Textbook: Ch. 7.1–7.3</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Slide 13c (First Order Multi Switch) | Textbook: Ch. 7.2</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>MA 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Theory 09 – Double Integrals 24‑10‑24.pdf</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Exercise 05 – Lesson 29‑10 (Double Integrals)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Subchapter: Multiple Integrals</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Tests: Test on double integrals (guided answers), Test on double integrals</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Exercise: Exercises on double integrals</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>LAG (Linear Algebra)</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Notes 13–14</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Textbook: Ch. 3.3–3.4 (Independence, Basis, Dimension)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+    </div>
+    <div class="day-footer">
+      <button class="btn" onclick="addSubsection('day6')">Add Subsection</button>
+    </div>
+  </details>
+
+  <!-- ================= DAY 7 (Jan 31) ================= -->
+  <details>
+    <summary>Day 7 (January 31, 2025)</summary>
+    <div id="day7">
+      <details open>
+        <summary>Physics 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Lecture 7</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Exercise 6</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>Circuit Theory</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Slides 13d–13e</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Slide 13d (Second Order) | Textbook: Ch. 8.1–8.5</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Slide 13e (First Order Summary) | Textbook: Ch. 7.7</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>MA 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Theory 10 – Triple Integrals 26‑10‑24.pdf</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Theory 11 – Triple &amp; Line Integrals 31‑10‑24.pdf</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Exercise 06 – Lesson 5‑11 (Triple Integrals)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Subchapter: Multiple Integrals</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Tests: triple integrals (guided), triple integrals</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>LAG (Linear Algebra)</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Notes 15–16</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Textbook: Ch. 3.5–3.6 (Rank, The Four Fundamental Subspaces)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+    </div>
+    <div class="day-footer">
+      <button class="btn" onclick="addSubsection('day7')">Add Subsection</button>
+    </div>
+  </details>
+
+  <!-- ================= DAY 8 (Feb 1) ================= -->
+  <details>
+    <summary>Day 8 (February 1, 2025)</summary>
+    <div id="day8">
+      <details open>
+        <summary>Physics 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Recap + Moodle Test Part 2</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>Circuit Theory</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Slides 14a–14b</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Slide 14a (Complex Numbers) | Textbook: Ch. 9.1</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Slide 14b (AC Circuits) | Textbook: Ch. 9.2–9.3</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>MA 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Theory 12 – Line Integrals and Conservative Fields 07‑11‑24.pdf</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Theory 13 – Green Gauss Theorem 08‑11‑24.pdf</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Exercise 07 – Lesson 12‑11 (Revolution Solids, Line Integrals)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Exercises on curvilinear and path integrals</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Subchapter: Integrals on Curves and Surfaces</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Tests: Test on path integrals (guided), Test on path integrals</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Exercise: Exercises on curvilinear and path integrals</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>LAG (Linear Algebra)</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Notes 17–18</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Textbook: Ch. 4.1–4.2 (Orthogonality, Projections)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+    </div>
+    <div class="day-footer">
+      <button class="btn" onclick="addSubsection('day8')">Add Subsection</button>
+    </div>
+  </details>
+
+  <!-- ================= DAY 9 (Feb 2) ================= -->
+  <details>
+    <summary>Day 9 (February 2, 2025)</summary>
+    <div id="day9">
+      <details open>
+        <summary>Physics 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Lecture 8</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Exercise 7</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>Circuit Theory</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Slides 14c–14d</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Slide 14c (AC Complex Power) | Textbook: Ch. 11.1–11.3</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Slide 14d (Sinusoidal Steady‑State Response) | Textbook: Ch. 10.1–10.4</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>MA 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Theory 14 – Surface Integrals 14‑11‑24.pdf</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Theory 15 – Gauss Theorem 15‑11‑24.pdf</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Exercise 08 – Lesson 19‑11 (Green–Gauss, Surface Integrals)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Exercises on surface and flux integrals</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Subchapter: Integrals on Curves and Surfaces</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Tests: surface integrals (guided), flux integrals (guided), etc.</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>LAG (Linear Algebra)</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Notes 19–20</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Textbook: Ch. 4.3–4.4 (Gram–Schmidt, Least Squares Problems)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+    </div>
+    <div class="day-footer">
+      <button class="btn" onclick="addSubsection('day9')">Add Subsection</button>
+    </div>
+  </details>
+
+  <!-- ================= DAY 10 (Feb 3) ================= -->
+  <details>
+    <summary>Day 10 (February 3, 2025)</summary>
+    <div id="day10">
+      <details open>
+        <summary>Physics 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Lecture 9</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>Circuit Theory</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Slides 15a–15b</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Slide 15a (Transfer Function) | Textbook: Ch. 14.2</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Slide 15b (Bode Plots) | Textbook: Ch. 14.3</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>MA 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Theory 16 – Stokes Theorem (21‑11‑24) [Focus on Divergence &amp; Stokes]</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Exercise 09 – Lesson 26‑11 (Divergence &amp; Stokes Theorems)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Subchapter: Integrals on Curves and Surfaces</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Tests: Theorems of Green, Stokes, Gauss (guided answers)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Exercise: Exercises on theorems of Green, Stokes, Gauss</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>LAG (Linear Algebra)</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Notes 21–22</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Textbook: Ch. 5.1–5.2 (Eigenvalues, Eigenvectors)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+    </div>
+    <div class="day-footer">
+      <button class="btn" onclick="addSubsection('day10')">Add Subsection</button>
+    </div>
+  </details>
+
+  <!-- ================= DAY 11 (Feb 4) ================= -->
+  <details>
+    <summary>Day 11 (February 4, 2025)</summary>
+    <div id="day11">
+      <details open>
+        <summary>Physics 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Lecture 9 + Exercise 8 (probably not examinable)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>Circuit Theory</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Slide 15c (Filters) | Textbook: Ch. 14.7–14.8</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>MA 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Theory 17 – Numerical and Power Series 28‑11‑24.pdf</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Theory 18 – Power Series 29‑11‑24.pdf</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Exercise 10 – Lesson 03_12 (Numerical &amp; Power Series)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Subchapter: Numerical Series</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Tests: numerical series (guided), etc.</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Exercise: Exercises on numerical series</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>LAG (Linear Algebra)</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Notes 23–24</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Textbook: Ch. 5.3 (Diagonalization)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+    </div>
+    <div class="day-footer">
+      <button class="btn" onclick="addSubsection('day11')">Add Subsection</button>
+    </div>
+  </details>
+
+  <!-- ================= DAY 12 (Feb 5) ================= -->
+  <details>
+    <summary>Day 12 (February 5, 2025)</summary>
+    <div id="day12">
+      <details open>
+        <summary>Physics 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Recap + Moodle Test Part 3</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>No remaining slides (all 00–15c covered). Review or catch up as needed.</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>Circuit Theory</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(No new slides left, general review possible)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>MA 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Theory 19 – Complex and Holomorphic Functions 05‑12‑24.pdf</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Theory 20 – Complex Line Integrals 06‑12‑24.pdf</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Exercise 11 – Lesson_10_12_2024 (McLaurin Series, Holomorphic)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Subchapter: Numerical Series &amp; Conservative Vector Fields</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Tests: Theoretical test on numerical series (guided), test on conservative fields (guided)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Exercise: Exercises on conservative vector fields (differential forms)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>LAG (Linear Algebra)</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox" disabled><label>(Plan 1 jumps from Day 11 on Feb 4 to Day 12 on Feb 8, so no LAG tasks on Feb 5.)</label></li>
+        </ul>
+      </details>
+    </div>
+    <div class="day-footer">
+      <button class="btn" onclick="addSubsection('day12')">Add Subsection</button>
+    </div>
+  </details>
+
+  <!-- ================= DAY 13 (Feb 8) ================= -->
+  <details>
+    <summary>Day 13 (February 8, 2025)</summary>
+    <div id="day13">
+      <details open>
+        <summary>Physics 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(No lecture)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>(Continue as needed or general review — per Plan 2’s note)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>Circuit Theory</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(No specific slides listed; general study or review)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>MA 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Theory 21 – Notes_Complex_Analysis_Prof.Recupero.pdf</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Theory 22 – Taylor and Laurent Series 07‑12‑24.pdf</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Exercise 12 – Lesson_12_12_2024 (Complex Line Integrals)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Tests: Theoretical test on conservative fields (guided), etc.</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>LAG (Linear Algebra)</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Notes 25–26</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Textbook: Ch. 6.1–6.2 (Positive Definite Matrices, Applications of Eigenvalues)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+    </div>
+    <div class="day-footer">
+      <button class="btn" onclick="addSubsection('day13')">Add Subsection</button>
+    </div>
+  </details>
+
+  <!-- ================= DAY 14 (Feb 9) ================= -->
+  <details>
+    <summary>Day 14 (February 9, 2025)</summary>
+    <div id="day14">
+      <details open>
+        <summary>Physics 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(No lecture)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>(General study or review)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>Circuit Theory</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(No specific slides listed; general study or review)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>MA 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>23 – Residues and Fourier Series 12‑12‑24.pdf</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>24 – Fourier Series 13‑12‑24.pdf</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Exercise 14 – Lesson 19_12_24 (Laurent Series), Exercises on power series</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Subchapter: Functions Series (Power Series)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Tests: Test on power series (guided), etc.</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>LAG (Linear Algebra)</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Textbook Only: Ch. 7.1–7.3 (Singular Value Decomposition)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+    </div>
+    <div class="day-footer">
+      <button class="btn" onclick="addSubsection('day14')">Add Subsection</button>
+    </div>
+  </details>
+
+  <!-- ================= DAY 15 (Feb 10) ================= -->
+  <details>
+    <summary>Day 15 (February 10, 2025)</summary>
+    <div id="day15">
+      <details open>
+        <summary>Physics 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(No lecture)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>(General study or review)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>Circuit Theory</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(No specific slides listed; general study or review)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>MA 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>15 – Lesson 20_12_24 (Fourier) | Exercises on Fourier series</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Subchapter: Functions Series (Fourier Series)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Tests: Theoretical test on power series (guided), test on Fourier series (guided)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Exercise: Exercises on Fourier series</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>LAG (Linear Algebra)</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Textbook Only: Ch. 8.1–8.3 (Principal Component Analysis, Data Fitting)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+    </div>
+    <div class="day-footer">
+      <button class="btn" onclick="addSubsection('day15')">Add Subsection</button>
+    </div>
+  </details>
+
+  <!-- ================= DAY 16 (Feb 11) ================= -->
+  <details>
+    <summary>Day 16 (February 11, 2025)</summary>
+    <div id="day16">
+      <details open>
+        <summary>Physics 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(No lecture)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>(No specific slides listed; general study or review)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>Circuit Theory</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(No specific slides listed; general study or review)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>MA 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(Review Day) Review any challenging topics from Days 1–15</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Exercises on systems of linear ODE</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Subchapter: Systems of Linear Ordinary Differential Equations</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Tests: Test on systems of linear ODE (guided), etc.</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>LAG (Linear Algebra)</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>Textbook Only: Ch. 9.1–9.2 (Linear Transformations)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+    </div>
+    <div class="day-footer">
+      <button class="btn" onclick="addSubsection('day16')">Add Subsection</button>
+    </div>
+  </details>
+
+  <!-- ================= DAY 17 (Feb 12) ================= -->
+  <details>
+    <summary>Day 17 (February 12, 2025)</summary>
+    <div id="day17">
+      <details open>
+        <summary>Physics 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(No lecture)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>(No specific slides listed; general study or review)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>Circuit Theory</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(No specific slides listed; general study or review)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>MA 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(Final Review &amp; Practice) Final overview of all topics (multivariable, integrals, series, ODEs, Laplace...)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Additional practice problems or mock exams</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>Moodle Tests: Any remaining or optional practice tests</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>LAG (Linear Algebra)</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox" disabled><label>(No new tasks in Plan 1 after Day 15.)</label></li>
+        </ul>
+      </details>
+    </div>
+    <div class="day-footer">
+      <button class="btn" onclick="addSubsection('day17')">Add Subsection</button>
+    </div>
+  </details>
+
+  <!-- ================= DAY 18 (Feb 13) ================= -->
+  <details>
+    <summary>Day 18 (February 13, 2025)</summary>
+    <div id="day18">
+      <details open>
+        <summary>Physics 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(No lecture)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>(No specific slides listed; general study or review)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>Circuit Theory</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(No specific slides listed; general study or review)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>LAG (Linear Algebra)</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(General review if needed)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+      <!-- MA 2 Plan ends on Day 17. -->
+    </div>
+    <div class="day-footer">
+      <button class="btn" onclick="addSubsection('day18')">Add Subsection</button>
+    </div>
+  </details>
+
+  <!-- ================= DAY 19 (Feb 14) ================= -->
+  <details>
+    <summary>Day 19 (February 14, 2025)</summary>
+    <div id="day19">
+      <details open>
+        <summary>Physics 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(No lecture)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>(No specific slides listed; general study or review)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+      <details open>
+        <summary>Circuit Theory</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(No specific slides listed; general study or review)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+      <details open>
+        <summary>LAG (Linear Algebra)</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(General review if needed)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+    </div>
+    <div class="day-footer">
+      <button class="btn" onclick="addSubsection('day19')">Add Subsection</button>
+    </div>
+  </details>
+
+  <!-- ================= DAY 20 (Feb 15) ================= -->
+  <details>
+    <summary>Day 20 (February 15, 2025)</summary>
+    <div id="day20">
+      <details open>
+        <summary>Physics 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(No lecture)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>(No specific slides listed; general study or review)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+      <details open>
+        <summary>Circuit Theory</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(No specific slides listed; general study or review)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+      <details open>
+        <summary>LAG (Linear Algebra)</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(General review if needed)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+    </div>
+    <div class="day-footer">
+      <button class="btn" onclick="addSubsection('day20')">Add Subsection</button>
+    </div>
+  </details>
+
+  <!-- ================= DAY 21 (Feb 16) ================= -->
+  <details>
+    <summary>Day 21 (February 16, 2025)</summary>
+    <div id="day21">
+      <details open>
+        <summary>Physics 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(No lecture)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>(No specific slides listed; general study or review)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+      <details open>
+        <summary>Circuit Theory</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(No specific slides listed; general study or review)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+      <details open>
+        <summary>LAG (Linear Algebra)</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(General review if needed)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+    </div>
+    <div class="day-footer">
+      <button class="btn" onclick="addSubsection('day21')">Add Subsection</button>
+    </div>
+  </details>
+
+  <!-- ================= DAY 22 (Feb 17) ================= -->
+  <details>
+    <summary>Day 22 (February 17, 2025)</summary>
+    <div id="day22">
+      <details open>
+        <summary>Physics 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(No lecture)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>(No specific slides listed; general study or review)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+      <details open>
+        <summary>Circuit Theory</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(No specific slides listed; general study or review)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+      <details open>
+        <summary>LAG (Linear Algebra)</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(General review if needed)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+    </div>
+    <div class="day-footer">
+      <button class="btn" onclick="addSubsection('day22')">Add Subsection</button>
+    </div>
+  </details>
+
+  <!-- ================= DAY 23 (Feb 18) ================= -->
+  <details>
+    <summary>Day 23 (February 18, 2025)</summary>
+    <div id="day23">
+      <details open>
+        <summary>Physics 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(No lecture)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>(No specific slides listed; general study or review)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+      <details open>
+        <summary>Circuit Theory</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(No specific slides listed; general study or review)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+      <details open>
+        <summary>LAG (Linear Algebra)</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(General review if needed)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+    </div>
+    <div class="day-footer">
+      <button class="btn" onclick="addSubsection('day23')">Add Subsection</button>
+    </div>
+  </details>
+
+  <!-- ================= DAY 24 (Feb 19) ================= -->
+  <details>
+    <summary>Day 24 (February 19, 2025)</summary>
+    <div id="day24">
+      <!-- LAG (Linear Algebra) only, per Plan 2's note. -->
+      <details open>
+        <summary>LAG (Linear Algebra)</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(Plan 2 simply listed “Linear Algebra:” but no specific tasks.)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>(Use for final catch-up or optional review if desired)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+    </div>
+    <div class="day-footer">
+      <button class="btn" onclick="addSubsection('day24')">Add Subsection</button>
+    </div>
+  </details>
+
+  <!-- ================= DAY 25 (Feb 20) ================= -->
+  <details>
+    <summary>Day 25 (February 20, 2025)</summary>
+    <div id="day25">
+      <details open>
+        <summary>Physics 2</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(No lecture)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+          <li><input type="checkbox"><label>(No specific slides listed; general study or review)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>Circuit Theory</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(No specific slides listed; general study or review)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+
+      <details open>
+        <summary>LAG (Linear Algebra)</summary>
+        <div class="subsection-header">
+          <button class="btn" onclick="addTask(this.closest('details'))">Add Task</button>
+          <button class="btn btn-remove" onclick="this.closest('details').remove()">Remove Subsection</button>
+        </div>
+        <ul class="tasks-list">
+          <li><input type="checkbox"><label>(General review if needed)</label><span class="remove-task" onclick="this.parentNode.remove()">(x)</span></li>
+        </ul>
+      </details>
+      <!-- MA 2 ended on Day 17, so not shown by default here. -->
+    </div>
+    <div class="day-footer">
+      <button class="btn" onclick="addSubsection('day25')">Add Subsection</button>
+    </div>
+  </details>
+
+</div>
+</body>
+</html>
